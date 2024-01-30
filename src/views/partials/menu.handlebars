@@ -5,8 +5,23 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
+        {{#if email}}
+          <li class="nav-item">
+            <p class="nav-link">Usuario: {{email}}</p>
+          </li>
+        {{else}}
         <li class="nav-item">
-          <a class="nav-link" href="/getall">Productos</a>
+            <p class="nav-link">Usuario: Anónimo </p>
+          </li>
+
+        {{/if}}
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/login">Login</a>
+        </li>        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/products">Productos</a>
         </li>        
         <li class="nav-item">
           <a class="nav-link" href="/add">Agregar Productos</a>
@@ -15,6 +30,12 @@
         <li class="nav-item">
           <a class="nav-link" href="/realTimeProducts">Real Time Products</a>
         </li>        
+        <li class="nav-item">
+          <a class="nav-link" href="/carts">Listado de Carritos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="api/sessions/logout">Logout</a>
+        </li> 
       </ul>
     </div>
   </div>

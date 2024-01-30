@@ -6,40 +6,55 @@ const dataTable = $('#productTable').DataTable();
 console.log("Título de la página:", programa);
 //funcion que actualiza la data en pantalla
 const obtenerProductos = async () => {
-  // "Pedimos la data al server por WS"
-  socket.emit('getproducts', limit);
+  try {
+    // "Pedimos la data al server por WS"
+    //console.log("Pedimos la data al server por WS")
+    socket.emit('getproducts', limit);
 
-  // Esperamos la data de manera asíncrona
-  const dataFromServer = await new Promise(resolve => {
-    socket.on('resultado.getproducts', data => resolve(data));
-  });
+    // Esperamos la data de manera asíncrona
+    const dataFromServer = await new Promise(resolve => {
+      socket.on('resultado.getproducts', data => resolve(data));      
+    });
+    
+    //console.log("data=", dataFromServer);
+    const products = dataFromServer;   
 
-  // Limpiamos la tabla
-  dataTable.clear().draw();
+    // Limpiamos la tabla
+    dataTable.clear().draw();
 
-  // Inyectamos la data a la tabla
-  dataFromServer.forEach(product => {  
+    //const isAdmin = false; // Replace with the actual admin status of the user
+    //console.log({{admin}});
+    //const isAdmin = {{admin}}; 
+    //isAdmin=False;
+    products.forEach(product => {
+      const deleteButton = isAdmin
+        ? '<button class="btn btn-danger eliminar-btn">Eliminar</button>'
+        : '<button class="btn btn-danger eliminar-btn" disabled>Eliminar</button>';
+    
+      dataTable.row.add([
+        product._id || '',
+        product.title || '',
+        product.description || '',
+        product.code || '',
+        product.price || '',
+        product.status || '',
+        product.stock || '',
+        product.category || '',
+        product.thumbnail || '',
+        deleteButton
+      ]).draw();
+    });
+    
 
-    dataTable.row.add([
-      product.id,
-      product.title,
-      product.description,
-      product.code,
-      product.price,
-      product.status,
-      product.stock,
-      product.category,
-      product.thumbnail,
-      '<button class="btn btn-danger eliminar-btn">Eliminar</button>'
-    ]).draw();
-  });
+
+  } catch (error) {
+    console.error('Error en obtenerProductos:', error);
+  }
 };
 
 // Resto del código...
-
-
-// llamamos la funcion de datos la 1era vez
 obtenerProductos();
+
 
 $(document).ready(function () {
   var dataTable = $('#productTable').DataTable();
@@ -54,7 +69,6 @@ $(document).ready(function () {
   });
 });
 
-
 function remove(productData) {
   const handleResult = function (status) {
     const messageText = status.message;
@@ -62,4 +76,3 @@ function remove(productData) {
   };
   socket.emit('eliminaProducto', productData, handleResult);
 }
-

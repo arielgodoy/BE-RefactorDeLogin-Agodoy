@@ -1,0 +1,44 @@
+### GET REQUEST DE TODOS LOS PRODUCCTOS
+GET http://localhost:8080/api/products/
+
+### GET DE PRODDUCTOS CON LIMITE
+GET http://localhost:8080/api/products/?limit=20?page=2&pageSize=10
+
+### GET PRODUCT CON ID
+GET http://localhost:8080/api/products/6584e0528d51ba74ff0662e4
+
+### POST DE PRODUCTO
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{       
+  "title": "Producto 7",
+  "description": "Producto 7",
+  "code": "nuevocodigo4",
+  "price": 100,
+  "thumbnail": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fes%2Fvector%2Ficono-de-producto",
+  "stock": 10,
+  "status": true,
+  "category": "nueva categoria"
+}
+    
+### put de producto
+PUT http://localhost:8080/api/products/6584e0528d51ba74ff0662e4
+Content-Type: application/json
+
+{       
+  "title": "Producto 7",
+  "description": "Producto 7",
+  "code": "nuevocodigo4",
+  "price": 100,
+  "thumbnail": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fes%2Fvector%2Ficono-de-producto",
+  "stock": 10,
+  "status": true,
+  "category": "nueva categoria"
+}
+
+### delete de producto
+DELETE http://localhost:8080/api/products/6584e0528d51ba74ff0662e4
+
+
+
