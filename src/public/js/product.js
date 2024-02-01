@@ -29,7 +29,7 @@ const obtenerProductos = async () => {
     products.forEach(product => {
       const deleteButton = isAdmin
         ? '<button class="btn btn-danger eliminar-btn">Eliminar</button>'
-        : '<button class="btn btn-danger eliminar-btn" disabled>Eliminar</button>';
+        : '<button class="btn btn-danger eliminar-btn" disabled>Unauthorized</button>';
     
       dataTable.row.add([
         product._id || '',

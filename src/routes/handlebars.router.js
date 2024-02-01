@@ -11,7 +11,7 @@ router
         title: "Listado de  productos",
         programa: "home",
         username: req.session.user || 'Invitado',
-        email: req.session.email || 'Nomail',
+        email: req.session.email || 'Invitado',
         admin: req.session.admin || false
     });
 })

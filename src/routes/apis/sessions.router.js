@@ -54,7 +54,9 @@ router
             }
             const newUser = await usersModel.create({ first_name, last_name, email, password });                
             req.session.user = newUser;    
+            console.log('Registro Exitoso')
             res.send({ message: 'Registro Exitoso' });
+            res.redirect('/login');
 
         } catch (error) {
             console.error('Error en el registro:', error);
