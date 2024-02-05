@@ -34,27 +34,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/public')));
 
-// Configuración de cookie-parser SESSION EN EL SERVIDOR  DE LA APLICACIÓN
-// app.use(session({
-//   secret:'mi_palabra_super_secret',
-//   resave: false,
-//   saveUninitialized: true  
-// }))
-
-// Configuración de cookie-parser SSESION EN LOCALSTORAGE
-// app.use(session({
-//   store: new SessionFileStore({
-//     path: './sessions',
-//     ttl: 10*60, // in seconds
-//     retire: 0
-//   }),
-//   secret: 'mi_palabra_super_secreta',
-//   resave: false,
-//   saveUninitialized: true 
-// }));
-
-// Configuración de cookie-parser SSESION EN MONGODB
-
 app.use(session({
   store: MongoStore.create({
       mongoUrl: 'mongodb+srv://arielgodoy:Ag13135401@clustermongodb.k5c43jz.mongodb.net/?retryWrites=true&w=majority',
@@ -67,10 +46,6 @@ app.use(session({
       maxAge: 1000 * 60 * 60 * 24, // Set the session to expire in 1 day
   },
 }));
-
-
-
-
 
 // Configuración de Handlebars
 const exphbs = require('express-handlebars');
@@ -112,7 +87,6 @@ const httpServer = app.listen(port, (err) => {
 const io = new Server(httpServer);
 io.on('connection', socket => {
   console.log('Nueva conexión entrante por WS');
-
   socket.on('addproduct', formData => {
     const status = productManager.addProduct(
       formData.title,
@@ -127,7 +101,6 @@ io.on('connection', socket => {
     socket.emit('resultado.addproduct', status);
     socket.broadcast.emit('productosactualizados', status);
   });
-
   socket.on('getproducts', async () => {
     console.log('entro a getproducts de WS');
     try {

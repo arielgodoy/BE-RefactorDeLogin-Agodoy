@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { usersModel } = require("../../dao/models/users.model.js");
 const authentication = require("../../middlewares/auth.middleware.js");
+const { isValidPassword, createHash } = require("../../utils/hashPassword.js");
 const router = Router();
 //const userservice = require('../../services/users.service.js')
 router
@@ -24,11 +25,11 @@ router
         const password = req.body.password || req.query.password;
         console.log(email, password);
         try {
-            const user = await usersModel.findOne({ email });          
-            if (!user || user.password !== password) {
+            const user = await usersModel.findOne({ email });
+            if(!isValidPassword(password,{password:user.password}) ) {
                 return res.status(401).send({ status: 'error', message: 'Usuario o contraseña incorrectos' });
             }
-            //una vez calidado el usuario y passsword aqui guardamos el objeto de usuario en la session
+            //una vez Validado el usuario y passsword aqui guardamos el objeto de usuario en la session
             req.session.user = {
                 user_id:user._id,
                 'first_name': user.first_name,
@@ -50,6 +51,7 @@ router
     .post('/register', async (req, res) => {
         const { first_name, last_name, email, password, role } = req.body;
         console.log(first_name, last_name, email, password, role);
+        
     
         if (first_name === '' || last_name === '' || email === '' || password === '' || role === '') {
             return res.status(400).send({ message: 'Faltan datos para Registro' });
@@ -62,7 +64,7 @@ router
                 return res.status(400).send({ message: 'Usuario ya existe' });
             }
     
-            const newUser = await usersModel.create({ first_name, last_name, email, password, role });
+            const newUser = await usersModel.create({ first_name, last_name, email, password:createHash(password), role });
             //creando una sesion con los datos del nuevo usuario
             const result = await newUser.save();
             res.send({
@@ -92,43 +94,6 @@ router
         res.redirect('/login');
 
     })
-
-// router de cookies
-// router
-// .get('/setCookie',(req,res)=>{
-//     console.log('setcookie')
-//     res.cookie('Micookie','esta es una cookie',{maxAge:60*60*24,signed:true}).send('Cookies seteadas')
-// })
-// .get('/getCookie',(req,res)=>{
-//     console.log('getcookie')    
-//     res.send(req.signedCookies)
-// })
-// .get('/deleteCookie',(req,res)=>{
-//     console.log('Micookie deleted')
-//     res.clearCookie('Micookie').send('Cookie Borrada')
-// })
-
-// .post('/login',async (req,res)=>{
-//     //const {email,password} = req.body
-//     //const user = await userservice.getUser({email})
-//     //if(!user) return res.status(401).send({status:'error',message:'usuario no exisre'})    
-// })
-// // post de register
-// .post('/register',(req,res)=>{
-//     const {first_name,last_name,email,password} = req.body
-//     console.log(username,password)
-//     if(username && password){
-//         req.session.user = username
-//         res.send({message:'Registered'})
-//     }else{
-//         res.send({message:'Missing credentials'})
-//     }
-// })
-// //post de logout
-// .post('/logout',(req,res)=>{
-//     req.session.destroy()
-//     res.send({message:'Logged out'})
-// })
 
 
 module.exports = router
