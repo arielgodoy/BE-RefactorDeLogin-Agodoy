@@ -8,8 +8,14 @@ const userRouter = require('./routes/users.router.js');
 const hbsrouter = require('./routes/handlebars.router.js');
 const sessionsRouter = require('./routes/apis/sessions.router.js');
 const { connectDb } = require('./config/mongo.js');
+// importacion de cookie-parser para manejar cookies en las solicitudes http
 const cookieParser= require('cookie-parser');
 const session = require('express-session');
+
+//session file store para login en localstorage
+const SessionFileStore = require('session-file-store')(session);
+//connect mongo para login en el servidor
+const MongoStore = require('connect-mongo');
 
 
 
@@ -27,12 +33,43 @@ const port = 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/public')));
-//app.use(cookieParser('mi_palabra_secreta'))
+
+// Configuración de cookie-parser SESSION EN EL SERVIDOR  DE LA APLICACIÓN
+// app.use(session({
+//   secret:'mi_palabra_super_secret',
+//   resave: false,
+//   saveUninitialized: true  
+// }))
+
+// Configuración de cookie-parser SSESION EN LOCALSTORAGE
+// app.use(session({
+//   store: new SessionFileStore({
+//     path: './sessions',
+//     ttl: 10*60, // in seconds
+//     retire: 0
+//   }),
+//   secret: 'mi_palabra_super_secreta',
+//   resave: false,
+//   saveUninitialized: true 
+// }));
+
+// Configuración de cookie-parser SSESION EN MONGODB
+
 app.use(session({
-  secret:'mi_palabra_super_secret',
-  resave: false,
-  saveUninitialized: true  
-}))
+  store: MongoStore.create({
+      mongoUrl: 'mongodb+srv://arielgodoy:Ag13135401@clustermongodb.k5c43jz.mongodb.net/?retryWrites=true&w=majority',
+      // ... other mongo options
+  }),
+  secret: 'your-secret-key',
+  resave: false, // Do not save the session if it hasn't been modified
+  saveUninitialized: true, // Save a new but uninitialized session
+  cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // Set the session to expire in 1 day
+  },
+}));
+
+
+
 
 
 // Configuración de Handlebars
