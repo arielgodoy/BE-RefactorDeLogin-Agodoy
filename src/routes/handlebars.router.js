@@ -6,15 +6,31 @@ const cartManager = new CartManager(); // Instantiate CartManager
 
 router
 .get("/products", (req, res) => {
-    console.log('Renderizando .. /products..'); 
+    console.log('Renderizando .. /products..');
+    console.log(req.session.user);
+    let username = 'Invitado';
+    let email = 'Invitado';
+    let admin = false;
+    if (req.session.user) {
+        if (req.session.user.first_name) {
+            username = req.session.user.first_name;
+        }
+
+        if (req.session.user.email) {
+            email = req.session.user.email;
+        }
+        admin = req.session.user.role === 'admin';
+    }
+
     res.render("home", {
-        title: "Listado de  productos",
+        title: "Listado de productos",
         programa: "home",
-        username: req.session.user || 'Invitado',
-        email: req.session.email || 'Invitado',
-        admin: req.session.admin || false
-    });
+        username: username,
+        email: email,
+        admin: admin
+    })
 })
+
 
 .get("/add", (req, res) => {
     console.log('Renderizando .. /add..');    

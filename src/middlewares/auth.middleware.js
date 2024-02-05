@@ -5,6 +5,4 @@ function authentication(req, res, next) {
         res.status(401).send({ status: 'error', message: 'No autorizado' });
     }
 }
-
-
 module.exports = authentication;

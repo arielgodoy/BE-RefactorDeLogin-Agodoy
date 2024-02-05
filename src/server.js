@@ -88,6 +88,7 @@ const handlebars = exphbs.create({
   },
 });
 
+
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('views', path.resolve(__dirname, 'views'));
