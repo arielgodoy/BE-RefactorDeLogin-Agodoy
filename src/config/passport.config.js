@@ -7,50 +7,67 @@ const localStrategy = local.Strategy
 const userservice = new UserDaoMongo();
 
 exports.initializePassport = () => {
-    passport.use('register',new localStrategy({
-        passReqToCallback:true,
-        usernameField:'email',
-        passwordField:'password'
-      },async (req, email, password, done) =>{
+  passport.use('register', new localStrategy({
+    passReqToCallback: true,
+    usernameField: 'email',
+    passwordField: 'password'
+}, async (req, email, password, done) => {
+    try {
+        
+        const { first_name, last_name, email, role } = req.body;
+        const existingUser = await userservice.findByEmail(email);
+        
+        
+        if (existingUser) {
+            return done(null, false, { message: 'User with this email already exists.' });
+        }
 
+        // Create a new user
+        
+        const newUser = {
+            first_name,
+            last_name,
+            email,
+            password: createHash(password),
+            role
+        };
+
+        const result = await userservice.createUser(newUser);
+        return done(null, result);
+    } catch (error) {
+        console.error('Error during user registration:', error);
+        return done('Error during user registration.');
+    }
+}));
+
+
+
+      passport.use('login', new localStrategy({
+        usernameField: 'email',
+        passwordField: 'password',
+        passReqToCallback: true, // Add this line
+      }, async (req, email, password, done) => {
         try {
-            const {first_name,last_name,role} = req.body;
-            let usuario = await userservice.getUser({email:email});
-            if(usuario) return done(null,false);
-                       
-            const newUser = {
-                first_name,
-                last_name,
-                email,
-                password:createHash(password),
-                role
+            const user = await userservice.findByEmail(email);
+            if (!user) {
+              console.log('Usuario no encontrado');
+              return done(null, false);
             }
-            let result = await userservice.createUser(newUser);
-            return done(null,result);
+            //console.log('Es un usuario valido')            
+            if (!isValidPassword(password, user.password)) {
+              return done(null, false);
+            }
+            return done(null, user);
+            
+
         } catch (error) {
-            return done('Error al Crear el usuario'+ error);
+          return done(error);
         }
       }));
+      
 
 
-    passport.use('login',new localStrategy({
-        usernameField:'email',
-        passwordField:'password'
-      },async (email, password, done) =>{
-        try {
-            const user = await userservice.getUser({email:email});
-            if(!user){
-                return done(null,false);
-            }
-            if(!isValidPassword(password,user.password)){
-                return done(null,false);
-            }
-            return done(null,user);
-        } catch (error) {
-            return done(error);
-        }
-      }));
-};
+      }
 
 passport.serializeUser((user,done)=>{
     done(null,user._id);

@@ -27,7 +27,7 @@ const UsersSchema = Schema({
 const usersModel = model(usersCollection, UsersSchema);
 
 module.exports = {
-    usersModel,
+    usersModel
 };
 
 // Example of using async/await with .create

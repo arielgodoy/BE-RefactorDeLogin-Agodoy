@@ -9,6 +9,7 @@ const hbsrouter = require('./routes/handlebars.router.js');
 const sessionsRouter = require('./routes/apis/sessions.router.js');
 const { connectDb } = require('./config/mongo.js');
 const passport = require('passport');
+const { initializePassport } = require('./config/passport.config.js');
 // passport
 
 // importacion de cookie-parser para manejar cookies en las solicitudes http
@@ -58,7 +59,6 @@ app.use(passport.session())
 
 // Configuración de Handlebars
 const exphbs = require('express-handlebars');
-const { initializePassport } = require('./config/passport.config.js');
 const handlebars = exphbs.create({
   helpers: {
     jsonStringify: function(context) {

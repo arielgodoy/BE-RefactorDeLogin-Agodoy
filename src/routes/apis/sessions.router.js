@@ -1,14 +1,36 @@
 const { Router } = require("express");
-const { usersModel } = require("../../dao/models/users.model.js");
 const authentication = require("../../middlewares/auth.middleware.js");
 const { isValidPassword, createHash } = require("../../utils/hashPassword.js");
 const passport = require("passport");
 const router = Router();
-//const userservice = require('../../services/users.service.js')
 router
-    .post('/register',passport.authenticate('register',{failregister:'/api/sessions/failregister'}))
+    .post('/register', (req, res, next) => {
+        console.log('Entering register route'); // Log statement
+        passport.authenticate('register', { failureRedirect: '/api/sessions/failregister' })(req, res, next);
+    }, (req, res) => {
+        // Logic for a successful registration
+        console.log('Registration successful')
+        //res.send('Registration successful');
+        res.redirect('/login');
+    })
     .get('/failregister',(req,res)=>{
-        res.send('Usuario ya existe')
+        console.log('Error en la estrategia de registro')
+        res.send('error al registrar el usuario')
+    })
+
+    .post('/login',passport.authenticate('login',{failureRedirect:'/api/seasions/faillogin'}), async (req,res)=>{
+        if(!req.user) return res.status(400).send({status:'error',eroor :'Usuario no encontrado'})
+        req.session.user = req.user;  //guardamos los datos del user en una sesion
+        console.log('Usuario logueado')
+        console.log('Before redirection to /products');
+        res.redirect('/products');
+        console.log('After redirection to /products');
+
+    }
+    )   
+    .get('/faillogin',(req,res)=>{
+        console.log('Error en la estrategia de login')
+        res.send('error al loguear el usuario')
     })
 
 
@@ -32,32 +54,5 @@ router
         }
     })
 
-    .post('/login', async (req, res) => {
-        //si email o password no estan en el body recuperar de params
-        const email = req.body.email || req.query.email;
-        const password = req.body.password || req.query.password;
-        console.log(email, password);
-        try {
-            const user = await usersModel.findOne({ email });
-            if (!isValidPassword(password, { password: user.password })) {
-                return res.status(401).send({ status: 'error', message: 'Usuario o contraseña incorrectos' });
-            }
-            //una vez Validado el usuario y passsword aqui guardamos el objeto de usuario en la session
-            req.session.user = {
-                user_id: user._id,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'email': user.email,
-                'role': user.role
-            }
-            res.send({
-                status: 'success',
-                payload: 'Login Success'
-            })
-
-        } catch (error) {
-            console.error('Login Internal Server Error:', error);
-            res.status(500).send({ message: 'Login Internal Server Error' });
-        }
-    })
+  
 module.exports = router
