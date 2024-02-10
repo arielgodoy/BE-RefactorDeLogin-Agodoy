@@ -3,71 +3,55 @@ const local = require('passport-local');
 const { isValidPassword, createHash } = require('../utils/hashPassword');
 const UserDaoMongo = require('../dao/usersDaoMongo.js');
 const localStrategy = local.Strategy
+const GithubStrategy = require('passport-github2').Strategy;
+
 
 const userservice = new UserDaoMongo();
 
 exports.initializePassport = () => {
-  passport.use('register', new localStrategy({
-    passReqToCallback: true,
-    usernameField: 'email',
-    passwordField: 'password'
-  }, async (req, email, password, done) => {
+  //estrategia de login con github
+  passport.use('github', new GithubStrategy({
+    clientID: 'Iv1.e91b5b5339313a57',
+    clientSecret: 'f500c35da77c2bf5b7933346e96cbf35f07f7ca6',
+    callbackURL: "http://localhost:8080/api/sessions/githubcallback"
+  }, async (accessToken, refreshToken, profile, done)=> {
     try {
-
-      const { first_name, last_name, email, role } = req.body;
-      const existingUser = await userservice.findByEmail(email);
-
-
-      if (existingUser) {
-        return done(null, false, { message: 'User with this email already exists.' });
+      console.log(profile)
+      let user = await userservice.getUser({ email: profile._json.email })
+      if (user) {
+        return done(null, user);
+      }
+      if (!profile.emails) {
+        return done(null, false, { message: 'No se puede registrar un usuario sin email' })
       }
       const newUser = {
-        first_name,
-        last_name,
-        email,
-        password: createHash(password),
-        role
-      };
-
-      const result = await userservice.createUser(newUser);
-      return done(null, result);
+        githubId: profile.id,
+        first_name: profile.displayName,
+        last_name: profile.displayName,
+        username: profile.username,
+        email: profile.emails[0].value,
+        password: ''
+       }
+      const createdUser = await userservice.createUser(newUser)
+      done(null, createdUser)
     } catch (error) {
-      console.error('Error during user registration:', error);
-      return done('Error during user registration.');
+      console.log(error)
+      return done(error)
     }
-  }));
+    
+  }
+));
 
 
 
-  passport.use('login', new localStrategy({
-    usernameField: 'email',
-    passwordField: 'password',
-    passReqToCallback: true,
-  }, async (req, email, password, done) => {
-    try {
-      const user = await userservice.findByEmail(email);
-      if (!user) {
-        console.log('Usuario no encontrado');
-        return done(null, false);
-      }
-      //console.log('Es un usuario valido')            
-      if (!isValidPassword(password, user.password)) {
-        return done(null, false);
-      }
-      return done(null, user);
-
-    } catch (error) {
-      return done(error);
-    }
-  }));
 
 
 
-}
+
 
 passport.serializeUser((user, done) => {
   done(null, user._id);
-});
+})
 
 passport.deserializeUser(async (id, done) => {
   try {
@@ -76,5 +60,6 @@ passport.deserializeUser(async (id, done) => {
   } catch (error) {
     done(error);
   }
-});
+})
 
+}

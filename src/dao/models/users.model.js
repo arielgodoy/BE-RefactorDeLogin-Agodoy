@@ -30,23 +30,23 @@ module.exports = {
     usersModel
 };
 
-// Example of using async/await with .create
-const createUser = async () => {
-    const userObject = {
-        first_name: 'ariel',
-        last_name: 'godoy',
-        email: 'arielgodoy@gmail.com',
-        password: 'hashedPassword', // You should hash the password before saving it
-        role: 'user',
-    };
+// // Example of using async/await with .create
+// const createUser = async () => {
+//     const userObject = {
+//         first_name: 'ariel',
+//         last_name: 'godoy',
+//         email: 'arielgodoy@gmail.com',
+//         password: 'hashedPassword', // You should hash the password before saving it
+//         role: 'user',
+//     };
 
-    try {
-        const user = await usersModel.create(userObject);
-        console.log('User created:', user);
-    } catch (error) {
-        console.error(error);
-    }
-};
+//     try {
+//         const user = await usersModel.create(userObject);
+//         console.log('User created:', user);
+//     } catch (error) {
+//         console.error(error);
+//     }
+// };
 
 // Call the function
 //createUser();

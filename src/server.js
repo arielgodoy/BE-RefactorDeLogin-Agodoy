@@ -37,23 +37,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/public')));
 
-app.use(session({
-  store: MongoStore.create({
-    mongoUrl: 'mongodb+srv://arielgodoy:Ag13135401@clustermongodb.k5c43jz.mongodb.net/?retryWrites=true&w=majority',
-    // ... other mongo options
-  }),
-  secret: 'your-secret-key',
-  resave: false, // Do not save the session if it hasn't been modified
-  saveUninitialized: true, // Save a new but uninitialized session
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24, // Set the session to expire in 1 day
-  },
-}));
 
-//middlewares de passport
 initializePassport()
+app.use(session({
+  secret: 'mipalabrasecreta',
+}))
 app.use(passport.initialize())
 app.use(passport.session())
+
+
 
 
 

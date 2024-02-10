@@ -4,6 +4,14 @@ const { isValidPassword, createHash } = require("../../utils/hashPassword.js");
 const passport = require("passport");
 const router = Router();
 router
+    .get('/github', passport.authenticate('github', { scope: ['user:email'] }))
+
+
+    .get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login' }), (req, res) => {
+        req.session.user = req.user;
+        res.redirect('/products');
+    })
+
     .post('/register', (req, res, next) => {
         console.log('Entering register route'); // Log statement
         passport.authenticate('register', { failureRedirect: '/api/sessions/failregister' })(req, res, next);
