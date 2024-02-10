@@ -16,7 +16,7 @@ exports.initializePassport = () => {
     callbackURL: "http://localhost:8080/api/sessions/githubcallback"
   }, async (accessToken, refreshToken, profile, done)=> {
     try {
-      console.log(profile)
+      //console.log(profile)
       let user = await userservice.getUser({ email: profile._json.email })
       if (user) {
         return done(null, user);
@@ -26,8 +26,8 @@ exports.initializePassport = () => {
       }
       const newUser = {
         githubId: profile.id,
-        first_name: profile.displayName,
-        last_name: profile.displayName,
+        first_name: profile._json.name,
+        last_name: profile._json.name,
         username: profile.username,
         email: profile.emails[0].value,
         password: ''
@@ -35,7 +35,7 @@ exports.initializePassport = () => {
       const createdUser = await userservice.createUser(newUser)
       done(null, createdUser)
     } catch (error) {
-      console.log(error)
+      //console.log(error)
       return done(error)
     }
     
